@@ -1,6 +1,12 @@
 require("dotenv").config();
 const express = require('express')
+
 const app = express();
+
+//Es obligatorio para leer JSON en req.body y debe ir antes de definir las rutas
+
+app.use(express.json());
+
 
 const routes = require('./api.routes')
 app.use('/api/v1', routes);
