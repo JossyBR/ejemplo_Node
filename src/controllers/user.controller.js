@@ -53,8 +53,6 @@ const create = async (req, res) => {
 
         }
 
-       
-
         return res.status(201).json({
             status: true,
             msg: "Usuario creado correctamente",
@@ -81,20 +79,22 @@ const update = async (req, res) => {
     try { 
         /** Captura el ID desde la URL */ 
         const idUser = req.params.id; 
+        //El "findByPk" Busca por llave primaria El "User.findByPk" Le apunta a buscar en el modelo
         const user = await User.findByPk(idUser); 
      
         if (!user) { 
           return res.status(404).json({ 
             status: false, 
-            msg: `Usuario a actualizar con el id: ${idUser}, no encontrado en base de 
-    datos.`, 
+            msg: `Usuario a actualizar con el id: ${idUser}, no encontrado en base de datos.`, 
             data: null, 
           }); 
         } 
      
         /** validar que el correo no exista en otro usuario */ 
         const emailExist = await User.findOne({ 
-          where: { email: req.body.email, id: { [Op.ne]: idUser } }, 
+          //"id: [Op.ne]: idUser " me excluye el valor del idUser de mi consulta
+          where: { email: req.body.email, 
+            id: { [Op.ne]: idUser } }, // Excluye el usuario con el id igual a 'idUser' (no lo incluye en la busqueda)
         }); 
         if (emailExist) { 
           return res.status(409).json({ 
@@ -105,9 +105,7 @@ const update = async (req, res) => {
         } 
         /** De lo contrario almacenar el usuario */ 
         const userUpdate = await User.update(req.body, { 
-          where: { id: idUser }, 
-                                           Aprende Node.js, creando una aplicación de ejemplo      35 
-     
+          where: { id: idUser },  
         }); 
      
         const userUpdated = await User.findByPk(idUser); 
@@ -134,15 +132,14 @@ const update = async (req, res) => {
     // }
 };
 
-const destroy = (req, res) => {
+const destroy = async (req, res) => {
     try { 
         const idUser = req.params.id; 
         const user = await User.findByPk(idUser); 
         if (!user) { 
           return res.status(404).json({ 
             status: false, 
-            msg: `Usuario a eliminar con el id: ${idUser}, no encontrado en base de 
-    datos.`, 
+            msg: `Usuario a eliminar con el id: ${idUser}, no encontrado en base de datos.`, 
             data: null, 
           }); 
         } 
